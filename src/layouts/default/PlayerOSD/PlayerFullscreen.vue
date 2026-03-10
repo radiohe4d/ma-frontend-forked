@@ -7,7 +7,7 @@
     z-index="9999"
     persistent
   >
-    <v-card :style="{ background: backgroundColor }">
+    <v-card class="fullscreen-player-card" :style="{ background: backgroundColor }">
       <v-toolbar class="v-toolbar-default" color="transparent">
         <template #prepend>
           <Button icon @click="store.showFullscreenPlayer = false">
@@ -69,7 +69,6 @@
                 store.activePlayer?.powered != false &&
                 store.activePlayer?.current_media?.image_url
               "
-              style="max-width: 100%; width: auto"
               :src="
                 getMediaImageUrl(store.activePlayer.current_media.image_url)
               "
@@ -177,7 +176,7 @@
                 store.activePlayer?.powered != false &&
                 store.curQueueItem?.streamdetails
               "
-              style="margin: auto; padding-top: min(20px, 2vh)"
+              style="padding-top: min(10px, 1vh)"
             >
               <QualityDetailsBtn />
             </div>
@@ -218,7 +217,10 @@
               {{ $t("lyrics") }}
             </v-tab>
           </v-tabs>
-          <div class="queue-items-scroll-box">
+          <div
+            class="queue-items-scroll-box"
+            :style="`--queue-title-size: ${queueTitleFontSize}; --queue-subtitle-size: ${queueSubtitleFontSize};`"
+          >
             <v-infinite-scroll
               v-if="!tempHide && activeQueuePanel !== 2"
               :onLoad="loadNextPage"
@@ -228,7 +230,7 @@
               <!-- list view -->
               <v-virtual-scroll
                 :item-height="70"
-                max-height="90%"
+                max-height="100%"
                 :items="activeQueuePanel == 0 ? nextItems : previousItems"
               >
                 <template #default="{ item, index }">
@@ -379,7 +381,6 @@
           <div class="main-media-details-image main-media-details-image-alt">
             <v-img
               v-if="store.activePlayer?.current_media?.image_url"
-              style="max-width: 100%; width: auto"
               :src="
                 getMediaImageUrl(store.activePlayer.current_media.image_url)
               "
@@ -737,38 +738,76 @@ watch(
 const titleFontSize = computed(() => {
   switch (name.value) {
     case "xs":
-      return "1.2em";
+      return "1.3em";
     case "sm":
-      return "1.4em";
+      return "1.6em";
     case "md":
-      return "2em";
+      return "1.8em";
     case "lg":
-      return store.showQueueItems ? "1.5em" : "2.5em";
+      return store.showQueueItems ? "1.7em" : "2.1em";
     case "xl":
-      return store.showQueueItems ? "1.6em" : "3em";
+      return store.showQueueItems ? "1.8em" : "2.3em";
     case "xxl":
-      return store.showQueueItems ? "1.7em" : "3.2em";
+      return store.showQueueItems ? "1.9em" : "2.5em";
     default:
-      return "1.0em.";
+      return "1.0em";
   }
 });
 
 const subTitleFontSize = computed(() => {
   switch (name.value) {
     case "xs":
-      return "1.05em";
+      return "0.95em";
     case "sm":
       return "1.15em";
     case "md":
-      return "1.7em";
+      return "1.3em";
     case "lg":
-      return store.showQueueItems ? "1.0em" : "1.6em";
+      return store.showQueueItems ? "1.2em" : "1.5em";
     case "xl":
-      return store.showQueueItems ? "1.2em" : "2em";
+      return store.showQueueItems ? "1.3em" : "1.65em";
     case "xxl":
-      return store.showQueueItems ? "1.2em" : "2em";
+      return store.showQueueItems ? "1.35em" : "1.8em";
     default:
-      return "1.0em.";
+      return "1.0em";
+  }
+});
+
+const queueTitleFontSize = computed(() => {
+  switch (name.value) {
+    case "xs":
+      return "0.875rem";
+    case "sm":
+      return "0.875rem";
+    case "md":
+      return "0.925rem";
+    case "lg":
+      return "0.9rem";
+    case "xl":
+      return "0.925rem";
+    case "xxl":
+      return "0.975rem";
+    default:
+      return "0.875rem";
+  }
+});
+
+const queueSubtitleFontSize = computed(() => {
+  switch (name.value) {
+    case "xs":
+      return "0.775rem";
+    case "sm":
+      return "0.775rem";
+    case "md":
+      return "0.8rem";
+    case "lg":
+      return "0.8rem";
+    case "xl":
+      return "0.8rem";
+    case "xxl":
+      return "0.85rem";
+    default:
+      return "0.775rem";
   }
 });
 
@@ -1466,20 +1505,26 @@ watchEffect(() => {
 
 <style scoped>
 
-.main {
-  --main-height: 57%;
-  --main-max-height: 65%;
+.fullscreen-player-card {
+  overflow: hidden;
+  height: 100%;
   display: flex;
-  min-height: 50% !important;
-  height: var(--main-height) !important;
-  max-height: var(--main-max-height) !important;
-  padding-bottom: 5px;
+  flex-direction: column;
 }
 
-.main-media-details {
+.main {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.main .main-media-details {
   flex: 50%;
   max-width: 100%;
   width: 50%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .main-queue-items {
@@ -1488,11 +1533,23 @@ watchEffect(() => {
   max-width: 100%;
   padding-right: 10px;
   padding-left: 15px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .queue-items-scroll-box {
-  max-height: 100%;
+  flex: 1;
+  min-height: 0;
   overflow-y: scroll;
+}
+
+.queue-items-scroll-box :deep(.v-list-item-title) {
+  font-size: var(--queue-title-size, 1rem);
+}
+
+.queue-items-scroll-box :deep(.v-list-item-subtitle) {
+  font-size: var(--queue-subtitle-size, 0.875rem);
 }
 
 .v-infinite-scroll--vertical {
@@ -1503,41 +1560,48 @@ watchEffect(() => {
   min-height: 50%;
   max-height: 80%;
   height: 60%;
-  align-content: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding-left: 20px;
   padding-right: 20px;
+  container-type: size;
 }
 .main-media-details-image .v-img {
-  width: auto;
+  width: min(100cqi, 100cqh);
+  height: min(100cqi, 100cqh);
+  flex: 0 0 auto;
   border-radius: 10px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
 }
 
 .main-media-details-image-alt {
   height: 100% !important;
   max-height: 100% !important;
-  align-content: center;
-  padding: 0px !important;
+  padding: 10px !important;
 }
 
 .main-media-details-track-info {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   text-align: center;
-  padding: 20px;
+  padding: 5% 0 10px;
+  overflow: hidden;
+}
+
+.main-media-details-track-info > * {
+  max-width: 100%;
 }
 
 .player-bottom {
-  max-height: 35% !important;
-  min-height: 25% !important;
-  height: 30% !important;
-  margin-top: auto;
-  bottom: 0;
+  flex-shrink: 0;
   position: unset !important;
-  padding-bottom: 5%;
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 3%);
+  width: 100%;
 }
 
 .track-info {
@@ -1689,21 +1753,15 @@ button {
 }
 
 @media (max-width: 540px) {
-  .main:has(.main-media-details) {
-    --main-height: 70%;
-    --main-max-height: 75%;
-  }
-
   .main-media-details-image {
-    height: 75%;
-    max-height: 85%;
+    height: 65%;
+    max-height: 75%;
     padding-left: 16px;
     padding-right: 16px;
   }
 
   .main-media-details-track-info {
-    padding: 8px;
-    height: 25%;
+    padding: 8px 0;
   }
 }
 
